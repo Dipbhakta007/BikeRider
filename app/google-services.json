@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "82616599744",
+    "firebase_url": "https://bike-rider-af3f7.firebaseio.com",
+    "project_id": "bike-rider-af3f7",
+    "storage_bucket": "bike-rider-af3f7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:82616599744:android:a3a9c2d05d44e60e",
+        "android_client_info": {
+          "package_name": "com.example.user.bikerider"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "82616599744-mbgj5i2piem68rjrlou3m90fpdlr6cgm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.user.bikerider",
+            "certificate_hash": "e4d65a2767e95694cbe7e50a5b3ad6ec3d8a789d"
+          }
+        },
+        {
+          "client_id": "82616599744-41n3b0t19dppo64ghk8rdue2jjmkqvgn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZWFJFYDdgtkWPXUuXxv-m2cfF4Ah_M7Y"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "82616599744-41n3b0t19dppo64ghk8rdue2jjmkqvgn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
