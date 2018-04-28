@@ -2,6 +2,7 @@ package com.example.user.bikerider;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -16,6 +17,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import dmax.dialog.SpotsDialog;
 
 public class DriverLoginActivity extends AppCompatActivity {
     private EditText mEmail,mPassword;
@@ -69,11 +72,16 @@ public class DriverLoginActivity extends AppCompatActivity {
             }
         });
 
+
         mLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 final  String email=mEmail.getText().toString();
                 final String password=mPassword.getText().toString();
+
+
+
+
 
                 mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(DriverLoginActivity.this, new OnCompleteListener<AuthResult>() {
                     @Override

@@ -1,10 +1,10 @@
 package com.example.user.bikerider;
 
-import android.*;
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
-import android.location.LocationManager;
+import android.service.carrier.CarrierService;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -24,7 +24,8 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
+public class testMapActivity extends FragmentActivity implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,com.google.android.gms.location.LocationListener {
+
 
     private GoogleMap mMap;
     private static final int MY_PERMISSION_REQUEST_CODE=7000;
@@ -47,7 +48,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_map);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+       mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
@@ -61,14 +62,14 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode){
-            case MY_PERMISSION_REQUEST_CODE:
-                if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
-                    buildGoogleApiClient();
-                    createLocationRequest();
-                    displayLocation();
-                }
-        }
+       switch (requestCode){
+           case MY_PERMISSION_REQUEST_CODE:
+               if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
+                   buildGoogleApiClient();
+                   createLocationRequest();
+                   displayLocation();
+               }
+       }
 
     }
 
@@ -77,8 +78,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this,new String[]{
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                   Manifest.permission.ACCESS_FINE_LOCATION,
             },MY_PERMISSION_REQUEST_CODE);
         }
         else{
@@ -141,7 +142,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
             final double lattitude=mLastLocation.getLatitude();
             final double longitude=mLastLocation.getLongitude();
             mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lattitude,longitude)));
-           
+            mMap.addMarker(new MarkerOptions().position(new LatLng(lattitude,longitude)).title("Marker in Dhaka"));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
         }
         else{
@@ -188,7 +189,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     @Override
     public void onConnectionSuspended(int i) {
-        mGoogleApiClient.connect();
+       mGoogleApiClient.connect();
     }
 
     @Override
