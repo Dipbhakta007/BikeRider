@@ -1,28 +1,42 @@
 package com.example.user.bikerider;
 
 import android.*;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
+import com.firebase.geofire.GeoFire;
+import com.firebase.geofire.GeoLocation;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
@@ -37,8 +51,14 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     private static int UPDATE_INTERVAL=1000;
     private static int FASTEST_INTERVAL=1000;
     private  int DISPLACEMENT=10;
+    Marker mCurrent;
 
     SupportMapFragment mapFragment;
+    DatabaseReference drivers;
+    GeoFire geoFire;
+    private Button mLogout;
+
+
 
 
 
@@ -51,8 +71,25 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+       mLogout=(Button)findViewById(R.id.logout);
+
+        mLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent=new Intent(DriverMapActivity.this,MainActivity.class);
+                startActivity(intent);
+                finish();
+                return;
+            }
+        });
+
         startLocationUpdates();
         displayLocation();
+
+        drivers=FirebaseDatabase.getInstance().getReference("driversAvailable");
+        geoFire=new GeoFire(drivers);
+
 
         setUpLocation();
 
@@ -138,11 +175,25 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         }
         mLastLocation=LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if(mLastLocation!=null){
+
+
             final double lattitude=mLastLocation.getLatitude();
             final double longitude=mLastLocation.getLongitude();
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lattitude,longitude)));
-           
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+
+            geoFire.setLocation(FirebaseAuth.getInstance().getCurrentUser().getUid(), new GeoLocation(lattitude, longitude), new GeoFire.CompletionListener() {
+                @Override
+                public void onComplete(String key, DatabaseError error) {
+                    if(mCurrent!=null)mCurrent.remove();
+                    mCurrent=mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.cycle_icon)).position(new LatLng(lattitude,longitude)).title("You"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(lattitude,longitude)));
+
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+
+
+                }
+            });
+
+            //Toast.makeText(this,"hyese",Toast.LENGTH_SHORT).show();
         }
         else{
 
@@ -176,6 +227,13 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     public void onLocationChanged(Location location) {
         mLastLocation=location;
         displayLocation();
+      /*  String user_id= FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference ref= FirebaseDatabase.getInstance().getReference("driversAvailable");
+        GeoFire geoFire=new GeoFire(ref);
+
+        geoFire.setLocation(user_id,new GeoLocation(location.getLatitude(),location.getLongitude()));*/
+
+
 
     }
 
@@ -193,6 +251,15 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+
+      // geoFire.removeLocation(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
     }
 }
