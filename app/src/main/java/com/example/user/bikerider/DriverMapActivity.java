@@ -71,7 +71,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-       mLogout=(Button)findViewById(R.id.logout);
+       mLogout=(Button)findViewById(R.id.logou);
 
         mLogout.setOnClickListener(new View.OnClickListener() {
             @Override
