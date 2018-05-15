@@ -46,6 +46,9 @@
         <activity
             android:name=".testMapActivity"
             android:label="@string/title_activity_test_map" />
+        <activity
+            android:name=".CustomerMapActivity"
+            android:label="@string/title_activity_customer_map"></activity>
     </application>
 
 </manifest>
