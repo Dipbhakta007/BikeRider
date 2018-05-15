@@ -38,14 +38,12 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
+            android:value="AIzaSyBAIOk7g2KrQr7-gZhq4_Dp_Gi7_p4sI7U" />
 
         <activity
             android:name=".DriverMapActivity"
             android:label="@string/title_activity_driver_map" />
-        <activity
-            android:name=".testMapActivity"
-            android:label="@string/title_activity_test_map" />
+
         <activity
             android:name=".CustomerMapActivity"
             android:label="@string/title_activity_customer_map"></activity>
