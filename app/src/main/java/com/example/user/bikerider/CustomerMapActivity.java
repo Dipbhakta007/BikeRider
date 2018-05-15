@@ -159,7 +159,7 @@ public class CustomerMapActivity extends FragmentActivity implements OnMapReadyC
                     HashMap map=new HashMap();
                     map.put("customerRideID",customerID);
                     driverRef.updateChildren(map);
-                     
+
                     DatabaseReference driverLocationRef=FirebaseDatabase.getInstance().getReference().child("driversAvailable").child(driverFoundID).child("l");
                     driverLocationRef.addValueEventListener(new ValueEventListener() {
                         @Override
