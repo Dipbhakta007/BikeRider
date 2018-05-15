@@ -34,9 +34,14 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.List;
+import java.util.Map;
 
 public class DriverMapActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
 
@@ -57,6 +62,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
     DatabaseReference drivers;
     GeoFire geoFire;
     private Button mLogout;
+    private String customerID="";
+    Marker pickupMarker;
 
 
 
@@ -71,7 +78,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-       mLogout=(Button)findViewById(R.id.logout);
+        mLogout=(Button)findViewById(R.id.logout);
 
         mLogout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +91,8 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
             }
         });
 
+
+
         startLocationUpdates();
         displayLocation();
 
@@ -93,7 +102,72 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
 
         setUpLocation();
 
+        getAssignedCustomer();
 
+
+    }
+
+    private void getAssignedCustomer()
+    {
+        String driverID=FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference assignedCustomerRef=FirebaseDatabase.getInstance().getReference().child("Users").child("Riders").child(driverID);
+        assignedCustomerRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists())
+                {
+                    Map<String,Object> map=(Map<String,Object>) dataSnapshot.getValue();
+                    if(map.get("customerRideID")!=null)
+                    {
+                        customerID=map.get("customerRideID").toString();
+                    }
+                    getAssignedCustomerPickupLocation();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+    private void  getAssignedCustomerPickupLocation()
+    {
+        DatabaseReference AssignedCustomerLocationRef=FirebaseDatabase.getInstance().getReference().child("customerRequests").child(customerID).child("l");
+        AssignedCustomerLocationRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.exists())
+                {
+                    List<Object> map=(List<Object>) dataSnapshot.getValue();
+                    double locationLat=0;
+                    double locationLong=0;
+
+
+                    if(map.get(0)!=null)
+                    {
+                        locationLat=Double.parseDouble(map.get(0).toString());
+                    }
+                    if(map.get(1)!=null)
+                    {
+                        locationLong=Double.parseDouble(map.get(1).toString());
+                    }
+
+                    LatLng driverLatLng=new LatLng(locationLat,locationLong);
+                    if(pickupMarker!=null)
+                    {
+                        pickupMarker.remove();;
+                    }
+                    pickupMarker=mMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.fromResource(R.drawable.customer)).position(driverLatLng).title("Pickup Location"));
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -259,7 +333,7 @@ public class DriverMapActivity extends FragmentActivity implements OnMapReadyCal
         super.onStop();
 
 
-      // geoFire.removeLocation(FirebaseAuth.getInstance().getCurrentUser().getUid());
+        // geoFire.removeLocation(FirebaseAuth.getInstance().getCurrentUser().getUid());
 
     }
 }
